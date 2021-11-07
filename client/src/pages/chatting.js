@@ -1,18 +1,20 @@
 import React from "react";
 
 import Header from "../components/Hearder";
-import Container from "../components/Container";
+import { ContainerSpace2, ContainerContent } from "../styles/style";
 
-function chattingPage(props) {
-
+function ChattingPage(props) {
+    const goChatList = () => props.history.push('/chat');
     return (
         <>
-            <Header back title="박효정">
+            <Header back title="박효정" function={goChatList}>
             </Header>
-            <Container>
-            </Container>
+            <ContainerSpace2>
+                < ContainerContent>
+                </ContainerContent>
+            </ContainerSpace2>
         </>
     );
 }
 
-export default chattingPage;
+export default ChattingPage;

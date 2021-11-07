@@ -1,21 +1,22 @@
 import React from "react";
 
 import Header from "../components/Hearder";
-import Container from "../components/Container";
+import { ContainerSpace, ContainerContent } from "../styles/style";
 import NaviBar from "../components/NaviBar";
 
-function chatListPage(props) {
-
+function ChatListPage(props) {
     return (
         <>
             <Header title="채팅 목록">
             </Header>
-            <Container>
-            </Container>
-            <NaviBar>
+            <ContainerSpace>
+                < ContainerContent>
+                </ContainerContent>
+            </ContainerSpace>
+            <NaviBar chat>
             </NaviBar>
         </>
     );
 }
 
-export default chatListPage;
+export default ChatListPage;
