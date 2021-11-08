@@ -1,15 +1,17 @@
+import React from "react";
 import { withRouter } from 'react-router-dom';
 
+
 import styled from "styled-components";
-import BackIcon from "./icon/Back"
-import SearchIcon from "./icon/Search"
+import BackIcon from "./icon/Back";
+import SearchIcon from "./icon/Search";
 
 function Header(props) {
     return (
         <HeaderSpace>
             <HeaderContent>
                 <Wrapper>
-                    {props.back&&<BackIcon> </BackIcon>}
+                    {props.back&&(props.function?<BackIcon function={props.function}></BackIcon>:<BackIcon></BackIcon>)}
                     <Title>
                         {props.title}
                     </Title>
@@ -19,6 +21,7 @@ function Header(props) {
                 </Wrapper>
             </HeaderContent>
         </HeaderSpace>
+        // 헤더 왜 자꾸 오류나지
     );
 }
 
@@ -26,7 +29,6 @@ export default withRouter(Header);
 
 export const HeaderSpace = styled.div`
     width:100%;
-    height:50px;
     box-sizing: border-box;
 
     position:fixed;
@@ -37,6 +39,8 @@ export const HeaderSpace = styled.div`
     justify-content: center;
 
     background-color:#ffffff;
+
+    border-bottom:1px solid #ECEBED;
 `
 
 export const HeaderContent = styled.div`
