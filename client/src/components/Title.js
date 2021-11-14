@@ -5,8 +5,8 @@ import styled from "styled-components";
 function Title(props) {
     return (
         <TitleBox>
-            <TitleContent>
-                {props.title}
+            <TitleContent onClick={props.onClick}>
+                {props.children}
             </TitleContent>
         </TitleBox>
     );

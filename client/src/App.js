@@ -21,15 +21,15 @@ function App() {
       <Route exact path="/" component={withRouter(LoginPage)} />
         <Route exact path="/register" component={withRouter(RegisterPage)} />
 
-        <Route exact path="/user" component={withRouter(MainPage)} />
-        <Route exact path="/search" component={withRouter(SearchPage)} />
+        <Route exact path="/user/:user_id" component={withRouter(MainPage)} />
+        <Route exact path="/search/:user_id" component={withRouter(SearchPage)} />
 
-        <Route exact path="/around" component={withRouter(AroundPage)} />
-        <Route exact path="/setting" component={withRouter(SettingPage)} />
+        <Route exact path="/around/:user_id" component={withRouter(AroundPage)} />
+        <Route exact path="/setting/:user_id" component={withRouter(SettingPage)} />
 
-        <Route exact path="/chat" component={withRouter(ChatListPage)} />
-        <Route exact path="/chatting" component={withRouter(ChattingPage)} />
-        {/* chatting별 아이디 처리 */}
+        <Route exact path="/chat/:user_id" component={withRouter(ChatListPage)} />
+        <Route exact path="/chatting/:user_id/:opponent" component={withRouter(ChattingPage)} />
+        <Route component={() => <Redirect to="/"/>}/>
       </Switch>
     </Router>
 
