@@ -2,8 +2,10 @@ package com.example.yonseitalk.controller;
 
 import com.example.yonseitalk.domain.ChatroomDetail;
 import com.example.yonseitalk.domain.Message;
+import com.example.yonseitalk.repository.UserRepository;
 import com.example.yonseitalk.service.ChatService;
 import com.example.yonseitalk.view.chatroom.ChatroomView;
+import com.example.yonseitalk.view.chatroom.MessageCount;
 import com.example.yonseitalk.view.chatroom.MessageListView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.*;
 public class ChatroomController {
 
     private final ChatService chatService;
+    private final UserRepository userRepository;
 
     @PostMapping(value = "/{user_id}/chatrooms")
     public ResponseEntity<?> newChatroom(@PathVariable("user_id") String userId, @RequestBody Map<String, String> body){
@@ -38,7 +41,10 @@ public class ChatroomController {
         ChatroomView chatroomView = new ChatroomView();
         if(!chatroomDetails.isEmpty()){
             chatroomDetails.forEach(chatroomDetail -> {
-               chatroomView.addSingleChatroom(chatroomDetail, userId);
+                String opponentId = (chatroomDetail.getUser_1().equals(userId))? chatroomDetail.getUser_2() : chatroomDetail.getUser_1();
+                chatroomDetail.setUser_1(userRepository.findById(chatroomDetail.getUser_1()).get().getName());
+                chatroomDetail.setUser_2(userRepository.findById(chatroomDetail.getUser_2()).get().getName());
+               chatroomView.addSingleChatroom(chatroomDetail, userRepository.findById(userId).get().getName(), opponentId);
             });
         }
         chatroomView.setSuccess(true);
@@ -52,7 +58,6 @@ public class ChatroomController {
         if(!messageList.isEmpty()) {
             for(Message m: messageList)
                 messageListView.addSingleMessage(m);
-
         }
         messageListView.setSuccess(true);
         return messageListView;
@@ -70,5 +75,13 @@ public class ChatroomController {
         else
             response.put("success", false);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{user_id}/chatrooms/{chatroom_id}/count")
+    public MessageCount getMessageCount(@PathVariable("user_id") String userId, @PathVariable("chatroom_id") Long chatroomId){
+        MessageCount messageCount = new MessageCount();
+        messageCount.setMessage_count(chatService.getMessageCount(chatroomId));
+        messageCount.setSuccess(true);
+        return messageCount;
     }
 }

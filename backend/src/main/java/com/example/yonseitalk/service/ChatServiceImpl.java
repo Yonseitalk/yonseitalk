@@ -22,6 +22,11 @@ public class ChatServiceImpl implements ChatService{
 
 
     @Override
+    public Long getMessageCount(Long chatroom_id){
+        if(chatroom_id<0) return 0L;
+        return messageRepository.countMessages(chatroom_id);
+    }
+    @Override
     public Long addChatroom(String user_1_id, String user_2_id) {
         Chatroom chatroom = new Chatroom();
 
@@ -40,25 +45,8 @@ public class ChatServiceImpl implements ChatService{
         Optional<User> user = userRepository.findById(user_id);
         if(!user.isPresent())
             return new ArrayList<>();
-
         List<ChatroomDetail> chatroomDetailList = chatroomDetailRepository.findChatroomListbyUser(user_id);
-//        List<ChatroomView> chatroomViews = new ArrayList<>();
-
-//        chatroomDetailList.forEach(chatroom -> {
-//            if(chatroom.getContent()!=null){
-//                transformContent(chatroom, user.get());
-//            }
-//
-//            chatroomViews.add(ChatroomView.builder()
-//                            .chatroom_id(chatroom.getChatroom_id())
-//                            .last_message(chatroom.getContent())
-//                            .last_send_time(chatroom.getSend_time())
-//                            .last_message_from(chatroom.getSender_id())
-//                            .opponent_name((String.valueOf(chatroom.getUser_1()).equals(user_id)) ? chatroom.getUser_2() : chatroom.getUser_1())
-//                            .message_location(chatroom.getRendezvous_location())
-//                            .rendezvous_time(chatroom.getRendezvous_time())
-//                    .build());
-//        });
+        chatroomDetailList.forEach(chatroomDetail -> chatroomDetail.setContent(transformContent(chatroomDetail,user.get())));
         return chatroomDetailList;
     }
 
