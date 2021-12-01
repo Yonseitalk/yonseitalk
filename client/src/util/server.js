@@ -1,4 +1,7 @@
 import axios from "axios";
+import { Cookies } from "react-cookie";
+
+const cookies= new Cookies();
 
 const server = axios.create();
 
@@ -7,5 +10,8 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
 } else {
     server.defaults.baseURL = "http://165.132.105.26:8201";
 }
+
+server.defaults.headers={"Authorization":accessToken ? `Bearer ${accessToken}` : ''};
+
 
 export default server;
