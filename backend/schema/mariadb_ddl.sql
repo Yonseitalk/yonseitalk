@@ -13,7 +13,7 @@ ALTER TABLE yonseitalk.location
 INSERT IGNORE INTO yonseitalk.location VALUES ('공학관');
 INSERT IGNORE INTO yonseitalk.location VALUES ('백양관');
 INSERT IGNORE INTO yonseitalk.location VALUES ('학생회관');
-INSERT IGNORE INTO yonseitalk.location VALUES ('언더우드관');
+INSERT IGNORE INTO yonseitalk.location VALUES ('신촌역');
 
 
 
@@ -99,7 +99,7 @@ ALTER TABLE yonseitalk.message
 #     ADD CONSTRAINT receiver_id_fk FOREIGN KEY (receiver_id) REFERENCES yonseitalk.yt_user(user_id) ON DELETE cascade;
 
 ALTER TABLE yonseitalk.message
-    ADD CONSTRAINT chatroom_id_fk FOREIGN KEY (chatroom_id) REFERENCES yonseitalk.chatroom(chatroom_id);
+    ADD CONSTRAINT chatroom_id_fk FOREIGN KEY (chatroom_id) REFERENCES yonseitalk.chatroom(chatroom_id) ON DELETE cascade;
 
 ALTER TABLE yonseitalk.message
     ALTER rendezvous_flag SET DEFAULT false;
