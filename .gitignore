@@ -30,6 +30,6 @@ target
 .idea
 .iml
 *.iml
-package-lock.json
-yarn.lock
+client/package-lock.json
+client/yarn.lock
 
