@@ -32,4 +32,7 @@ target
 *.iml
 client/package-lock.json
 client/yarn.lock
+backend/src/main/java/com/example/yonseitalk/scripts/
+backend/src/main/resources/application.properties
+
 
