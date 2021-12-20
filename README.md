@@ -1,7 +1,7 @@
 # Yonsei Talk
 
 
-## 데모 접속 링크
+## 데모 링크
 AWS에 배포된 서비스 링크입니다.
 
 [연세톡 링크](http://ec2-3-15-24-68.us-east-2.compute.amazonaws.com:3000/)
