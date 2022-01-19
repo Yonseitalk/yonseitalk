@@ -1,11 +1,12 @@
 package com.example.yonseitalk.util;
 
 import com.example.yonseitalk.domain.User;
+import com.example.yonseitalk.service.CustomUserDetailService;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
+//import io.jsonwebtoken.io.Decoders;
+//import io.jsonwebtoken.io.Encoders;
+//import io.jsonwebtoken.security.Keys;
+//import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,12 +20,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 
@@ -39,6 +39,11 @@ public class JwtUtil {
 
     private final UserDetailsService userDetailsService;
 
+    @PostConstruct
+    protected void init(){
+        secretKey= Base64.getEncoder().encodeToString(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
+
 
     private String createToken(Map<String, Object> claims) {
 
@@ -47,11 +52,11 @@ public class JwtUtil {
 //        Key key = Keys.hmacShaKeyFor(keyBytes);
 
 
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+//        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()
                 .setClaims(claims)
-                .signWith(SignatureAlgorithm.HS256,key)
+                .signWith(SignatureAlgorithm.HS256,secretKey)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .compact();
@@ -61,9 +66,11 @@ public class JwtUtil {
     private Claims extractAllClaims(String token) {
         if (StringUtils.isEmpty(token)) return null;
         Claims claims = null;
+        log.info("extracting...");
         try {
             claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         } catch (JwtException e) {
+            log.info("extracting problem");
             claims = null;
         }
         return claims;
@@ -102,6 +109,7 @@ public class JwtUtil {
     public String generateToken(User users) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("user_id", users.getUser_id());
+        claims.put("roles",users.getAuthorities());
         return createToken(claims);
     }
 
