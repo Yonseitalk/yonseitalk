@@ -115,6 +115,7 @@ public class JwtUtil {
 
     public Authentication getAuthentication(String token) {
         String email = extractAllClaims(token).get("user_id").toString();
+//        extractAllClaims(token).get("roles");
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
