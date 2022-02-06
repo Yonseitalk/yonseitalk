@@ -1,32 +1,47 @@
 package com.example.yonseitalk.repository;
 
-
-import com.example.yonseitalk.web.user.dto.FriendUser;
 import com.example.yonseitalk.web.user.dto.UserDto;
 import com.example.yonseitalk.web.user.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-
-
+@Slf4j
 @SpringBootTest
-@Transactional
-class DBFriendUserRepositoryTest {
+class UserRepositoryFriendTest {
+
 
     @Autowired
     private UserService userService;
 
+
     @Test
-    void findAllTest() {
+    @Transactional
+    void save(){
 
-        //given
+        UserDto userDto = userService.findById("tt").get();
+        Assertions.assertThat(userService.findFriendUser("tt").size()).isEqualTo(2);
+        Assertions.assertThat(userService.findFriendUser("pp").size()).isEqualTo(1);
+        Assertions.assertThat(userService.findFriendUser("nam").size()).isEqualTo(0);
 
+    }
+
+    @Test
+    @Transactional
+    void delete(){
+
+        userService.delFriend("tt", "pp");
+        log.info(userService.findFriendUser("tt").toString());
+        Assertions.assertThat(userService.findFriendUser("tt").size()).isEqualTo(1);
+
+    }
+
+    @BeforeEach
+    void setup(){
         UserDto user1 = UserDto.builder()
                 .userId("tt")
                 .name("jihoon")
@@ -63,22 +78,9 @@ class DBFriendUserRepositoryTest {
         userService.save(user2);
         userService.save(user3);
 
-        userService.addFriend(user1.getUserId(), user2.getUserId());
-        userService.addFriend(user1.getUserId(), user3.getUserId());
+        userService.addFriend("tt", "pp");
+        userService.addFriend("tt", "nam");
+        userService.addFriend("pp", "nam");
 
-        //then
-        List<FriendUser> friends = userService.findFriendUser(user1.getUserId());
-        System.out.println(friends);
-        assertThat(friends.size()).isEqualTo(2);
-        assertThat(friends.stream().map(FriendUser::getUserId)).contains("pp");
-        assertThat(friends.stream().map(FriendUser::getUserId)).contains("nam");
-        assertThat(friends.contains(user2));
-        assertThat(friends.contains(user3));
-        assertThat(friends.stream().map(FriendUser::getChatroomId)).containsNull();
-        assertThat(friends.stream().map(FriendUser::getUserLocation)).contains("공학관");
     }
-
-
-
-
 }
