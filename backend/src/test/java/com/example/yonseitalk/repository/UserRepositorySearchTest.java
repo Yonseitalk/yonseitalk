@@ -1,35 +1,31 @@
 package com.example.yonseitalk.repository;
 
-
-import com.example.yonseitalk.web.user.dto.FriendUser;
+import com.example.yonseitalk.web.user.dto.SearchUser;
 import com.example.yonseitalk.web.user.dto.UserDto;
 import com.example.yonseitalk.web.user.service.UserService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.*;
-
 
 @SpringBootTest
 @Transactional
-class DBFriendUserRepositoryTest {
+class UserRepositorySearchTest {
+
 
     @Autowired
     private UserService userService;
 
     @Test
-    void findAllTest() {
+    void searchTest() {
 
         //given
-
         UserDto user1 = UserDto.builder()
-                .userId("tt")
-                .name("jihoon")
+                .userId("aabb")
+                .name("zffgg")
                 .password("ddda")
                 .statusMessage("hihi")
                 .type("학생")
@@ -38,23 +34,33 @@ class DBFriendUserRepositoryTest {
                 .build();
 
         UserDto user2 = UserDto.builder()
-                .userId("nam")
-                .name("jihoon")
+                .userId("bbcc")
+                .name("zghh")
                 .password("ddda")
                 .statusMessage("hihi")
-                .type("일반")
+                .type("학생")
                 .userLocation("공학관")
                 .connectionStatus(true)
                 .build();
 
         UserDto user3 = UserDto.builder()
-                .userId("pp")
-                .name("jihoon")
+                .userId("ccdd")
+                .name("zhhii")
+                .password("dda")
+                .statusMessage("hihi")
+                .type("학생")
+                .userLocation("공학관")
+                .connectionStatus(true)
+                .build();
+
+        UserDto user4 = UserDto.builder()
+                .userId("ddee")
+                .name("iijj")
                 .password("ddda")
                 .statusMessage("hihi")
-                .type("강사")
+                .type("학생")
                 .userLocation("공학관")
-                .connectionStatus(false)
+                .connectionStatus(true)
                 .build();
 
 
@@ -62,23 +68,13 @@ class DBFriendUserRepositoryTest {
         userService.save(user1);
         userService.save(user2);
         userService.save(user3);
+        userService.save(user4);
 
-        userService.addFriend(user1.getUserId(), user2.getUserId());
-        userService.addFriend(user1.getUserId(), user3.getUserId());
+        userService.addFriend(user2.getUserId(), user3.getUserId());
 
         //then
-        List<FriendUser> friends = userService.findFriendUser(user1.getUserId());
+        List<SearchUser> friends = userService.search(user2.getUserId(),"z");
         System.out.println(friends);
-        assertThat(friends.size()).isEqualTo(2);
-        assertThat(friends.stream().map(FriendUser::getUserId)).contains("pp");
-        assertThat(friends.stream().map(FriendUser::getUserId)).contains("nam");
-        assertThat(friends.contains(user2));
-        assertThat(friends.contains(user3));
-        assertThat(friends.stream().map(FriendUser::getChatroomId)).containsNull();
-        assertThat(friends.stream().map(FriendUser::getUserLocation)).contains("공학관");
+        Assertions.assertThat(friends.size()).isEqualTo(2);
     }
-
-
-
-
 }

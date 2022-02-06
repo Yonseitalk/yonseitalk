@@ -1,6 +1,6 @@
 package com.example.yonseitalk.controller;
 
-import com.example.yonseitalk.domain.User;
+import com.example.yonseitalk.web.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,8 +15,7 @@ public class SecurityTestController {
 
     @GetMapping("/permit-all")
     public User getTestPermitAll(){
-        User testUser=new User();
-        testUser.setUser_id("test-permit-all");
+        User testUser = User.builder().name("test-permit-all").build();
         return testUser;
     }
 }

@@ -1,9 +1,10 @@
 package com.example.yonseitalk.controller;
 
-import com.example.yonseitalk.service.LoginService;
-import com.example.yonseitalk.domain.LoginFormat;
-import com.example.yonseitalk.domain.User;
-import com.example.yonseitalk.util.JwtUtil;
+import com.example.yonseitalk.util.login.service.LoginService;
+import com.example.yonseitalk.util.login.LoginFormat;
+import com.example.yonseitalk.web.user.domain.User;
+import com.example.yonseitalk.util.login.jwt.JwtUtil;
+import com.example.yonseitalk.web.user.dto.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class LoginController {
         if (session != null) {
             Object user = session.getAttribute("loginUser");
             User loginUser= (User)user;
-            String redirect="/"+loginUser.getUser_id();
+            String redirect="/"+loginUser.getUserId();
             response.sendRedirect(redirect);
         }
     }
@@ -58,15 +59,14 @@ public class LoginController {
         LoginFormat loginFormat=objectMapper.readValue(messageBody,LoginFormat.class);
 
 
-        User loginUser=loginService.login(loginFormat.getUser_id(),loginFormat.getPassword());
+        UserDto loginUser = loginService.login(loginFormat.getUser_id(),loginFormat.getPassword());
 
         if(loginUser==null){
             return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
         }
         log.info("loginFormat:{}",loginFormat);
         //status change True
-        loginService.updateConnectionTrue(loginUser);
-
+        loginService.updateConnectionTrue(loginUser.getUserId());
 
         String token="";
         token = jwtUtil.generateToken(loginUser);
@@ -78,10 +78,8 @@ public class LoginController {
     @PostMapping("/{user_id}/logout")
     public void logout(@PathVariable("user_id") String userId,HttpServletRequest request,HttpServletResponse response) throws IOException{
 
-        User logoutUser = new User();
-        logoutUser.setUser_id(userId);
-        loginService.updateConnectionFalse(logoutUser);
 
+        loginService.updateConnectionFalse(userId);
         response.setStatus(200);
 
     }
