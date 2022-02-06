@@ -1,12 +1,14 @@
 package com.example.yonseitalk.controller;
 
-import com.example.yonseitalk.web.chatroom.domain.Chatroom;
-import com.example.yonseitalk.web.user.dto.UserDto;
-import com.example.yonseitalk.web.user.dto.nearbyUser;
+import com.example.yonseitalk.domain.Chatroom;
+import com.example.yonseitalk.domain.User;
+import com.example.yonseitalk.domain.nearbyUser;
 import com.example.yonseitalk.exception.NotFoundException;
-import com.example.yonseitalk.web.chatroom.domain.ChatroomRepository;
-import com.example.yonseitalk.web.user.service.UserService;
+import com.example.yonseitalk.repository.ChatroomRepository;
+import com.example.yonseitalk.repository.UserRepository;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,26 +19,27 @@ import java.util.*;
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin("*")
+
 public class UserInfoController {
 
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final ChatroomRepository chatroomRepository;
 
     @RequestMapping(value = "/{user_id}", method = RequestMethod.GET)
     public ResponseEntity<?> userInfo(@PathVariable("user_id") String userId){
 
-        Optional<UserDto> userDto = userService.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
         Map<String, String> userInfo = new HashMap<>();
         Map<String, Object> response = new HashMap<>();
 
-        if(!userDto.isPresent()) {
+        if(!user.isPresent()) {
             response.put("success", false);
             response.put("code", new NotFoundException());
         } else{
             response.put("success", true);
-            userInfo.put("name", userDto.get().getName());
-            userInfo.put("status_message", userDto.get().getStatusMessage());
-            userInfo.put("location_name", userDto.get().getUserLocation());
+            userInfo.put("name", user.get().getName());
+            userInfo.put("status_message", user.get().getStatus_message());
+            userInfo.put("location_name", user.get().getUser_location());
             response.put("user", userInfo);
         }
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -45,7 +48,7 @@ public class UserInfoController {
     @PostMapping(value = "/{user_id}/location")
     public ResponseEntity<?> updateLocation(@PathVariable("user_id") String userId, @RequestBody Map<String, String> location){
 
-        int status = userService.updateUserLocation(userId, location.get("location_name"));
+        int status = userRepository.updateUserLocation(userId, location.get("location_name"));
 
         Map<String, Object> response = new HashMap<>();
         if(status > 0)
@@ -58,7 +61,7 @@ public class UserInfoController {
     @PostMapping(value = "/{user_id}/status")
     public ResponseEntity<?> updateMessage(@PathVariable("user_id") String userId, @RequestBody Map<String, String> statusMessage){
 
-        int status = userService.updateStatusMessage(userId, statusMessage.get("status_message"));
+        int status = userRepository.updateStatusMessage(userId, statusMessage.get("status_message"));
 
         Map<String, Object> response = new HashMap<>();
         if(status > 0)
@@ -71,13 +74,13 @@ public class UserInfoController {
     @DeleteMapping(value = "/{user_id}")
     public ResponseEntity<?> deleteUser(@PathVariable("user_id") String userId){
 
-        userService.deleteById(userId);
+        int status = userRepository.delete(userId);
 
         Map<String, Object> response = new HashMap<>();
-//        if(status > 0)
-        response.put("success", true);
-//        else
-//            response.put("success", false);
+        if(status > 0)
+            response.put("success", true);
+        else
+            response.put("success", false);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -87,15 +90,15 @@ public class UserInfoController {
 
         Map<String, Object> response = new HashMap<>();
 
-        Optional<UserDto> userDto = userService.findById(userId);
+        Optional<User> user = userRepository.findById(userId);
 
 
-        if(!userDto.isPresent()) {
+        if(!user.isPresent()) {
             response.put("success", false);
             response.put("code", new NotFoundException());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
-        String location=userDto.get().getUserLocation();
+        String location=user.get().getUser_location();
         response.put("success",true);
         response.put("myplace",location);
         //추가하기
@@ -104,40 +107,40 @@ public class UserInfoController {
         ArrayList<nearbyUser> offlineUser =new ArrayList<>();
 
         //ArrayList<User>
-        List<UserDto> nearbyPeople = userService.findByLocation(target_location);
+        List<User> nearbyPeople= userRepository.findByLocation(target_location);
 
-        for(UserDto user2: nearbyPeople){
-            if(user2.getUserId().equals(userDto.get().getUserId())){
+        for(User user2: nearbyPeople){
+            if(user2.getUser_id().equals(user.get().getUser_id())){
                 continue;
             }
-            if(user2.getConnectionStatus()){
+            if(user2.getConnection_status()){
                 //connection
                 nearbyUser onlineNearByUser= new nearbyUser();
-                onlineNearByUser.setUserId(user2.getUserId());
+                onlineNearByUser.setUser_id(user2.getUser_id());
                 onlineNearByUser.setName(user2.getName());
                 onlineNearByUser.setType(user2.getType());
-                onlineNearByUser.setStatusMessage(user2.getStatusMessage());
+                onlineNearByUser.setStatus_message(user2.getStatus_message());
                 //chatroom 추가
-                Optional<Chatroom> chatroom =chatroomRepository.findByPairUser(userDto.get().getUserId(),user2.getUserId());
+                Optional<Chatroom> chatroom =chatroomRepository.findByPairUser(user.get().getUser_id(),user2.getUser_id());
 
                 if (chatroom.isPresent()){
-                    onlineNearByUser.setChatroomId(chatroom.get().getChatroomId());
+                    onlineNearByUser.setChatroom_id(chatroom.get().getChatroom_id());
                 }
 
                 onlineUser.add(onlineNearByUser);
             }
             else{//not connection
                 nearbyUser offlineNearByUser= new nearbyUser();
-                offlineNearByUser.setUserId(user2.getUserId());
+                offlineNearByUser.setUser_id(user2.getUser_id());
                 offlineNearByUser.setName(user2.getName());
                 offlineNearByUser.setType(user2.getType());
-                offlineNearByUser.setStatusMessage(user2.getStatusMessage());
+                offlineNearByUser.setStatus_message(user2.getStatus_message());
 
                 // chatroom
-                Optional<Chatroom> chatroom =chatroomRepository.findByPairUser(userDto.get().getUserId(),user2.getUserId());
+                Optional<Chatroom> chatroom =chatroomRepository.findByPairUser(user.get().getUser_id(),user2.getUser_id());
 
                 if (chatroom.isPresent()){
-                    offlineNearByUser.setChatroomId(chatroom.get().getChatroomId());
+                    offlineNearByUser.setChatroom_id(chatroom.get().getChatroom_id());
                 }
 
 

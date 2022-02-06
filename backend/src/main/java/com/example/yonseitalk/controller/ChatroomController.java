@@ -1,12 +1,12 @@
 package com.example.yonseitalk.controller;
 
-import com.example.yonseitalk.web.chatroom.dto.ChatroomDetail;
-import com.example.yonseitalk.web.chatroom.dto.ChatroomView;
-import com.example.yonseitalk.web.chatroom.service.ChatService;
-import com.example.yonseitalk.web.message.dto.MessageCount;
-import com.example.yonseitalk.web.message.dto.MessageDto;
-import com.example.yonseitalk.web.message.dto.MessageListView;
-import com.example.yonseitalk.web.user.service.UserService;
+import com.example.yonseitalk.domain.ChatroomDetail;
+import com.example.yonseitalk.domain.Message;
+import com.example.yonseitalk.repository.UserRepository;
+import com.example.yonseitalk.service.ChatService;
+import com.example.yonseitalk.view.chatroom.ChatroomView;
+import com.example.yonseitalk.view.chatroom.MessageCount;
+import com.example.yonseitalk.view.chatroom.MessageListView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +21,7 @@ import java.util.*;
 public class ChatroomController {
 
     private final ChatService chatService;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
     @PostMapping(value = "/{user_id}/chatrooms")
     public ResponseEntity<?> newChatroom(@PathVariable("user_id") String userId, @RequestBody Map<String, String> body){
@@ -41,10 +41,10 @@ public class ChatroomController {
         ChatroomView chatroomView = new ChatroomView();
         if(!chatroomDetails.isEmpty()){
             chatroomDetails.forEach(chatroomDetail -> {
-                String opponentId = (chatroomDetail.getUser1().equals(userId))? chatroomDetail.getUser2() : chatroomDetail.getUser1();
-                chatroomDetail.setUser1(userService.findById(chatroomDetail.getUser1()).get().getName());
-                chatroomDetail.setUser2(userService.findById(chatroomDetail.getUser2()).get().getName());
-                chatroomView.addSingleChatroom(chatroomDetail, userService.findById(userId).get().getName(), opponentId);
+                String opponentId = (chatroomDetail.getUser_1().equals(userId))? chatroomDetail.getUser_2() : chatroomDetail.getUser_1();
+                chatroomDetail.setUser_1(userRepository.findById(chatroomDetail.getUser_1()).get().getName());
+                chatroomDetail.setUser_2(userRepository.findById(chatroomDetail.getUser_2()).get().getName());
+               chatroomView.addSingleChatroom(chatroomDetail, userRepository.findById(userId).get().getName(), opponentId);
             });
         }
         chatroomView.setSuccess(true);
@@ -53,10 +53,10 @@ public class ChatroomController {
 
     @GetMapping(value = "/{user_id}/chatrooms/{chatroom_id}")
     public MessageListView getMessages(@PathVariable("user_id") String userId, @PathVariable("chatroom_id") Long chatroomId){
-        List<MessageDto> messageList = chatService.messageInquiry(chatroomId, userId);
+        List<Message> messageList = chatService.messageInquiry(chatroomId, userId);
         MessageListView messageListView = new MessageListView();
         if(!messageList.isEmpty()) {
-            for(MessageDto m: messageList)
+            for(Message m: messageList)
                 messageListView.addSingleMessage(m);
         }
         messageListView.setSuccess(true);
