@@ -1,7 +1,7 @@
 package com.example.yonseitalk;
 
-import com.example.yonseitalk.web.user.dto.UserDto;
-import com.example.yonseitalk.web.user.service.UserService;
+import com.example.yonseitalk.domain.User;
+import com.example.yonseitalk.repository.DBUserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class YonseitalkApplicationTests {
 
 	@Autowired
-	private UserService userService;
+	private DBUserRepository dbUserRepository;
 
 	@Autowired
 	private MockMvc mvc;
@@ -41,18 +42,17 @@ class YonseitalkApplicationTests {
 
 	@BeforeEach
 	void setup(){
+		User user1= new User();
+		user1.setUser_id("flaxinger1");
+		user1.setName("yohan");
+		user1.setPassword("mok");
 
-		UserDto user1 = UserDto.builder()
-				.userId("flaxinger1")
-				.name("yohan")
-				.password("mok")
-				.statusMessage("Preswot")
-				.type("학생")
-				.userLocation("공학관")
-				.connectionStatus(true)
-				.build();
+		user1.setStatus_message("Preswot");
+		user1.setType("1");
+		user1.setUser_location("공학관");
+		user1.setConnection_status(true);
 
-		userService.save(user1);
+		dbUserRepository.save(user1);
 	}
 	@Test
 	@Transactional
