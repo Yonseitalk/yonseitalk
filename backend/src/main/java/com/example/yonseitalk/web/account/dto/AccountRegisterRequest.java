@@ -5,14 +5,14 @@ import lombok.Data;
 
 @Data
 public class AccountRegisterRequest {
-    private String accountId;
+    private String user_id;
     private String name;
     private String password;
     private String type;
 
     public Account toEntity(){
         return Account.builder()
-                .accountId(accountId)
+                .accountId(user_id)
                 .name(name)
                 .password(password)
                 .type(type)

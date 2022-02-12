@@ -27,7 +27,7 @@ public class AccountRegisterController {
     @PostMapping("")
     public void register(@RequestBody AccountRegisterRequest accountRegisterRequest, HttpServletResponse response) throws IOException {
 
-        if(accountService.findById(accountRegisterRequest.getAccountId()).isEmpty()){
+        if(accountService.findById(accountRegisterRequest.getUser_id()).isEmpty()){
             AccountDto accountDto = accountService.save(accountRegisterRequest);
             log.info("User={}", accountDto);
             //true로 응답을 줘라.(이건 일단 이대로 리다이렉팅으로 하자)
