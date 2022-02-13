@@ -24,9 +24,9 @@ public interface ChatroomRepository extends JpaRepository<Chatroom, String> {
             "sender_id as senderId, content as content, "+
             "send_time as sendTime, rendezvous_flag as rendezvousFlag, "+
             "rendezvous_location as rendezvousLocation, rendezvous_time as rendezvousTime, connection_status as connectionStatus " +
-            "from (select * from chatroom, yt_user where (last_message_id is not null) and (user_1=?1 or user_2 = ?1) and " +
-            "((user_1 <> ?1 and user_1 = user_id) or " +
-            "(user_2 <> ?1 and user_2 = user_id))) as chatroom " +
+            "from (select * from chatroom, yt_account where (last_message_id is not null) and (user_1=?1 or user_2 = ?1) and " +
+            "((user_1 <> ?1 and user_1 = account_id) or " +
+            "(user_2 <> ?1 and user_2 = account_id))) as chatroom " +
             "left join message m on chatroom.last_message_id = m.message_id " +
             "order by send_time desc;", nativeQuery = true)
     List<ChatroomDetailProjection> findChatroomListbyUser(String user_id);
