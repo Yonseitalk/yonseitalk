@@ -26,7 +26,7 @@ public class AccountServiceImpl implements AccountService {
     public void save(AccountDto.Request.Register accountRegisterRequest) {
         accountRepository.findById(accountRegisterRequest.getAccountId())
                 .ifPresent(user -> {throw new DuplicateAccountException();});
-        accountRegisterRequest.setPassword(AES128.getAES128_Encode(accountRegisterRequest.getPassword()));
+//        accountRegisterRequest.setPassword(AES128.getAES128_Encode(accountRegisterRequest.getPassword()));
         Account account = accountRegisterRequest.toEntity();
         account.setConnectionStatus(false);
         account.setStatusMessage("");
